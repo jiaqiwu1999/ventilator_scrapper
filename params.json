@@ -1,0 +1,35 @@
+{
+    "original": {
+        "Lung-Compliance": 0.1,
+        "Lung-Resistance": 10,
+        "Lung-V0": 0,
+        "Lung-Shift": -0.1,
+        "Lung-RR": 12,
+        "lung-Pmus": 5,
+        "Lung-Ti": 1,
+        "Vent-PS": 5,
+        "vent-PEEP": 5,
+        "Vent-InspCycleOff": 30
+    },
+
+    "hyperinflation": {
+
+    },
+
+    "early cycling": {
+
+    },
+
+    "late cycling": {
+
+    }
+
+
+    
+
+
+
+
+
+
+}
