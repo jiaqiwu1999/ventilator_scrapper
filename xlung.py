@@ -16,7 +16,12 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 SAVE_DIR = './data/xlung/'
 
-JSON_FILE = 'xlung_params.json'
+TYPE = 1
+
+MODE = 0
+
+JSON_FILE = f'xlung_param_type_{TYPE}_mode_{MODE}.json'
+
 
 with open(JSON_FILE, 'r') as f:
     DICT = json.load(f)
@@ -24,7 +29,6 @@ with open(JSON_FILE, 'r') as f:
 
 
 def main():
-    patient_type = 1
     if not os.path.isdir(SAVE_DIR):
         os.mkdir(SAVE_DIR)
     geckodriver_autoinstaller.install()
@@ -39,6 +43,8 @@ def main():
 
     driver = webdriver.Firefox(firefox_profile=profile,
                             desired_capabilities=desired)
+
+    driver.fullscreen_window()
     url = 'https://simulation.xlung.net/en/xlung/demo'
     driver.get(url)
     # time.sleep(2)
@@ -57,31 +63,32 @@ def main():
     example = DICT['todo'][0]
     pause = driver.find_element(By.CLASS_NAME, 'pauseSimulation')
     pause.click()
-    dest = driver.find_element(By.TAG_NAME, 'canvas')
     patient_category = driver.find_element(By.XPATH, '//a[@class="dropdown-toggle"][contains(text(), "Normal")]')
-    #patient_category.click()
-    # menu = driver.find_element(By.XPATH, '//li[@class="dropdown open"]')
-    # menu_items = menu.find_element(By.XPATH, './/ul')
-    # lis = menu_items.find_elements(By.XPATH, './/li')
-    # lis[patient_type].click()
+    patient_category.click()
+    menu = driver.find_element(By.XPATH, '//li[@class="dropdown open"]')
+    menu_items = menu.find_element(By.XPATH, './/ul')
+    lis = menu_items.find_elements(By.XPATH, './/li')
+    lis[TYPE].click()
     metabolic_disorder = driver.find_element(By.XPATH, '//a[@class="dropdown-toggle"][contains(text(), "metabolic")]')
     #metabolic_disorder.click()
     mode = driver.find_element(By.XPATH, '//a[@class="dropdown-toggle"][contains(text(), "A/C")]')
-    # confirm = driver.find_element(By.CLASS_NAME, 'commit-button center-block')
-    #mode.click()
-    # for key in example.keys():
-    #     print(key)
-    #     locator[key].clear()
-    #     locator[key].send_keys(example[key])
-    # confirm.click()
+    confirm = driver.find_element(By.XPATH, '//div[@class="commit-button center-block"]')
+    # mode.click()
+    for key in example.keys():
+        print(key)
+        print(example[key])
+        locator[key].send_keys(Keys.COMMAND + 'a') # diff for windows
+        locator[key].send_keys(example[key])
+    confirm.click()
     pause.click()
     time.sleep(15)
     pause.click()
+    dest = driver.find_element(By.TAG_NAME, 'canvas')
     loc = dest.location
     width = dest.size['width']
-    # print(loc)
-    # print(size)
-  
+    print(loc)
+    # driver.execute_script("window.scrollTo(0,0)")
+    # driver.execute_script("window.scrollBy(0,-1*document.body.scrollHeight)")
     action = webdriver.ActionChains(driver)
     action.move_to_element_with_offset(dest, 50, 0).perform()
     position = 0

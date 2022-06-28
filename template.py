@@ -1,5 +1,6 @@
 import json
 import argparse
+from math import comb
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -17,13 +18,15 @@ GEN_TEMP = True
 
 ADD_TEMP = False
 
-def gen_template(keys, values, index, length=10):
+MODE = ["VCV-mode", "PCV-mode", "PSV-mode"]
+
+def gen_template(keys, values, index, m, length=10):
     d = {'finished': [], 'todo': []}
     temp = dict(zip(keys, values))
     temp = [temp] * length
     d['todo'] = temp
     j = json.dumps(d, indent=4)
-    with open(f'xlung_param_type_{index}.json', 'w') as f:
+    with open(f'xlung_param_type_{index}_mode_{m}.json', 'w') as f:
         f.write(j)
 
 def main():
@@ -31,6 +34,7 @@ def main():
     parser.add_argument('--gen', default=True, action=argparse.BooleanOptionalAction, help='Generate new template?')
     parser.add_argument('--add', default=False, action=argparse.BooleanOptionalAction, help='Add to existing template?')
     parser.add_argument('--type', default=1, help='Type of patient [0-9]')
+    parser.add_argument('--mode', default=0, help="Ventilator mode: 0 - VCV 1 - PCV 2 - PSV")
     args = parser.parse_args()
     geckodriver_autoinstaller.install()
 
@@ -54,9 +58,11 @@ def main():
     # inp = driver.find_element(By.ID, 'age')
     # inp.send_keys('20')
     try:
-        WebDriverWait(driver, 10).until_not(EC.presence_of_element_located((By.CLASS_NAME,  'loading')))
+        WebDriverWait(driver, 20).until_not(EC.presence_of_element_located((By.CLASS_NAME,  'loading')))
     except:
         print("Timed out..")
+    
+    mode = MODE[args.mode]
     patient_category = driver.find_element(By.XPATH, '//a[@class="dropdown-toggle"][contains(text(), "Normal")]')
     patient_category.click()
 
@@ -65,31 +71,48 @@ def main():
     lis = menu_items.find_elements(By.XPATH, './/li')
     lis[args.type].click()
 
-    inputs = driver.find_elements(By.XPATH, '//input[@type="number"]')
+    combined_inputs = []
+
+    basic_input_div = driver.find_element(By.ID, 'patient')
+    basic_inputs = basic_input_div.find_elements(By.XPATH, './/input[@type="number"][@inputmode="numeric"]')
+    combined_inputs.extend(basic_inputs)
+    vent_div = driver.find_element(By.ID, mode)
+    vent_inputs = vent_div.find_elements(By.XPATH, './/input[@type="number"][@inputmode="numeric"]')
+    combined_inputs.extend(vent_inputs)
+
+    vent_common_div = driver.find_element(By.XPATH, '//div[@class="ventilator-common col-xs-12"]')
+    vent_common_inputs = vent_common_div.find_elements(By.XPATH, './/input[@type="number"][@inputmode="numeric"]')
+    combined_inputs.extend(vent_common_inputs)
+
     names = []
     vals = []
     if args.gen:
-        for inp in inputs:
+        for inp in combined_inputs:
             n = inp.get_attribute('id')
+            if n == 'frequency' or n == '':
+                continue
             val = inp.get_attribute('value')
             print(n)
             names.append(n)
             vals.append(val)
-        gen_template(names, vals, args.type)
-    with open(f'xlung_params_type_{args.type}', 'r') as f:
-        params = json.load(f)
-    if args.add:
-        for inp in inputs:
-            n = inp.get_attribute('id')
-            val = inp.get_attribute('value')
-            print(n)
-            names.append(n)
-            vals.append(val)
-        p = dict(zip(names, vals))
-        params['todo'].append([p] * 5)
-        j = json.dumps(params, indent=4)
-        with open(JSON_FILE, 'w') as f:
-            f.write(j)
+        gen_template(names, vals, args.type, args.mode)
+    else:
+        with open(f'xlung_params_type_{args.type}', 'r') as f:
+            params = json.load(f)
+        if args.add:
+            for inp in combined_inputs:
+                n = inp.get_attribute('id')
+                if n == 'frequency' or n == '':
+                    continue
+                val = inp.get_attribute('value')
+                print(n)
+                names.append(n)
+                vals.append(val)
+            p = dict(zip(names, vals))
+            params['todo'].append([p] * 5)
+            j = json.dumps(params, indent=4)
+            with open(f'xlung_param_type_{args.type}_mode_{args.mode}.json', 'w') as f:
+                f.write(j)
 
 
 if __name__ == '__main__':

@@ -21,7 +21,7 @@ DURATION = 10
 RESOLUTION = 0.01
 CYCLE = 3
 
-with open('params.json', 'r') as f:
+with open(JSON_FILE, 'r') as f:
     DICT = json.load(f)
 
 
