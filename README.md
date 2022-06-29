@@ -1,4 +1,4 @@
-# Ventilator Scrapper
+# Ventilator Scraper
 - Scraps online simulation data from ventsim.cc and xlung.net
 - Used for lung-ventilation related projects that requires patient ventilator interaction
 
