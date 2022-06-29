@@ -1,5 +1,6 @@
 # Ventilator Scraper
-- Scraps online simulation data from ventsim.cc and xlung.net
+- Scraps online simulation data (volume, flow, pressure) from ventsim.cc and xlung.net
+- Save the data as .csv file and .png (for visualization)
 - Used for lung-ventilation related projects that requires patient ventilator interaction
 
 # Prerequisites
@@ -20,4 +21,4 @@
   - Needs to specify whether to save a graph (--save) <br />
 
 # TODO
-1. Change the Firefox profile path in xlung.py, template.py & ventsim.py
+1. Change the Firefox profile path according to your own laptop in xlung.py, template.py & ventsim.py
