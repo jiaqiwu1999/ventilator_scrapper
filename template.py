@@ -38,6 +38,8 @@ def main():
     args = parser.parse_args()
     geckodriver_autoinstaller.install()
 
+    # TODO
+    # Change this file path
     profile = webdriver.FirefoxProfile(
         '/Users/wujiaqi/Library/Application Support/Firefox/Profiles/756agzw0.default-release')
 
@@ -50,13 +52,7 @@ def main():
                             desired_capabilities=desired)
     url = 'https://simulation.xlung.net/en/xlung/demo'
     driver.get(url)
-    # time.sleep(5)
-    #pause = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME,  'pauseSimulation')))
-    # confirm = driver.find_element(By.CLASS_NAME, 'commit-button center-block')
-    # pause = driver.find_element(By.CLASS_NAME, 'dropdown')
-    #pause.click()
-    # inp = driver.find_element(By.ID, 'age')
-    # inp.send_keys('20')
+
     try:
         WebDriverWait(driver, 20).until_not(EC.presence_of_element_located((By.CLASS_NAME,  'loading')))
     except:

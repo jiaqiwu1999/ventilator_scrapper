@@ -2,7 +2,7 @@
 import time
 import os
 import json
-import numpy as np
+import argparse
 import matplotlib.pyplot as plt
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,23 +16,28 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 SAVE_DIR = './data/xlung/'
 
-TYPE = 1
-
-MODE = 0
-
-JSON_FILE = f'xlung_param_type_{TYPE}_mode_{MODE}.json'
-
-
-with open(JSON_FILE, 'r') as f:
-    DICT = json.load(f)
-
-
-
 def main():
+    parser = argparse.ArgumentParser(description='Automate xlung.net simulation')
+    parser.add_argument('--type', default=1, help='Type of patient [0-9]')
+    parser.add_argument('--mode', default=0, help="Ventilator mode: 0 - VCV 1 - PCV 2 - PSV")
+    args = parser.parse_args()
+
+    TYPE = args.type
+
+    MODE = args.mode
+
+    JSON_FILE = f'xlung_param_type_{TYPE}_mode_{MODE}.json'
+
+    with open(JSON_FILE, 'r') as f:
+        DICT = json.load(f)
+    
+
     if not os.path.isdir(SAVE_DIR):
         os.mkdir(SAVE_DIR)
     geckodriver_autoinstaller.install()
 
+    # TODO
+    # Change this file path
     profile = webdriver.FirefoxProfile(
         '/Users/wujiaqi/Library/Application Support/Firefox/Profiles/756agzw0.default-release')
 

@@ -3,6 +3,7 @@ import time
 import os
 import json
 import numpy as np
+import argparse
 import matplotlib.pyplot as plt
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -95,10 +96,15 @@ def simulate(info, driver, locator, start, save_graph):
 
 
 def main():
+    parser = argparse.ArgumentParser(description='Automate xlung.net simulation')
+    parser.add_argument('--graph', default=True, help='Save a plot of pressure, volume, flow?')
+    args = parser.parse_args()
     if not os.path.isdir(SAVE_DIR):
         os.mkdir(SAVE_DIR)
     geckodriver_autoinstaller.install()
 
+    # TODO
+    # Change this file path
     profile = webdriver.FirefoxProfile(
         '/Users/wujiaqi/Library/Application Support/Firefox/Profiles/756agzw0.default-release')
 
@@ -134,7 +140,7 @@ def main():
     for event_type in DICT['todo']:
         for i, event in enumerate(DICT['todo'][event_type]):
             try:
-                simulate(event, driver, locator, start, True)
+                simulate(event, driver, locator, start, args.graph)
             except:
                 print("Something went wrong in this simulation..")
                 DICT['todo'][event_type] = DICT['todo'][event_type][i:]
@@ -152,13 +158,6 @@ def main():
             f.write(j)
     except:
         print("Failed to update json file...")
-
-    # plt.plot(pressures)
-    # plt.show()
-
-    
-    # driver.execute_script("arguments[0].setAttribute('value', arguments[1])", compliance, '0.3')
-
 
 
 
